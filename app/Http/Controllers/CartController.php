@@ -77,7 +77,7 @@ class CartController extends Controller
                     'quantity' => $quantity,
                     'price' => $price,
                     'subtotal' => $itemSubtotal,
-                    'image' => $image?->image,
+                    'image' => $image,
                 ];
             }
 
