@@ -907,7 +907,7 @@
 
                                 <img
                                     id="mainProductImage"
-                                    src="{{ asset('storage/' . $product->images->first()->image) }}"
+                                    src="{{ $product->images->first()->url }}"
                                     alt="{{ $product->name }}"
                                     class="h-full w-full object-cover"
                                     loading="eager"
@@ -932,35 +932,35 @@
 
                 {{-- THUMBNAILS --}}
 
-                @if($product->images->count() > 1)
+           @if($product->images->count() > 1)
 
-                    <div class="product-thumbnails mt-3">
+            <div class="product-thumbnails mt-3">
 
-                        @foreach($product->images as $index => $image)
+                @foreach($product->images as $index => $image)
 
-                            <button
-                                type="button"
-                                class="product-thumbnail {{ $index === 0 ? 'active' : '' }}"
-                                onclick="changeProductImage(
-                                    @js(asset('storage/' . $image->image)),
-                                    this
-                                )"
-                                aria-label="عرض صورة {{ $index + 1 }}"
-                            >
+                    <button
+                        type="button"
+                        class="product-thumbnail {{ $index === 0 ? 'active' : '' }}"
+                        onclick="changeProductImage(
+                            @js($image->url),
+                            this
+                        )"
+                        aria-label="عرض صورة {{ $index + 1 }}"
+                    >
 
-                                <img
-                                    src="{{ $image->url }}"
-                                    alt="{{ $product->name }} - صورة {{ $index + 1 }}"
-                                    loading="lazy"
-                                >
+                        <img
+                            src="{{ $image->url }}"
+                            alt="{{ $product->name }} - صورة {{ $index + 1 }}"
+                            loading="lazy"
+                        >
 
-                            </button>
+                    </button>
 
-                        @endforeach
+                @endforeach
 
-                    </div>
+            </div>
 
-                @endif
+        @endif
 
             </section>
 

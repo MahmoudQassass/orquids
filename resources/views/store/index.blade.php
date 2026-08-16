@@ -2274,7 +2274,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             @if($product->images->count())
 
                                 <img
-                                    src="{{ asset('storage/' . $product->images->first()->image) }}"
+                                    src="{{ $product->images->first()->url }}"
                                     alt="{{ $product->name }}"
                                     loading="lazy"
                                     class="aspect-[4/4.5] w-full object-cover transition duration-700 ease-out group-hover:scale-105"

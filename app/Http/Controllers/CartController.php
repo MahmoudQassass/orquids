@@ -70,7 +70,7 @@ class CartController extends Controller
 
                 $cartCount += $quantity;
 
-                $image = $product->images->first();
+                $image = $product->images->first()->url;
 
                 $items[] = [
                     'product' => $product,
