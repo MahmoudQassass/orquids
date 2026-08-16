@@ -956,7 +956,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 {{-- Facebook --}}
                 <a
-                    href="https://facebook.com/"
+                    href="https://www.facebook.com/profile.php?id=61593226028948"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Facebook"
@@ -984,7 +984,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 {{-- Instagram --}}
                 <a
-                    href="https://instagram.com/"
+                    href="https://www.instagram.com/orkuids/"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Instagram"
@@ -1031,7 +1031,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 {{-- TikTok --}}
                 <a
-                    href="https://tiktok.com/"
+                    href="https://www.tiktok.com/@orkuids"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="TikTok"
