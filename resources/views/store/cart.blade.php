@@ -647,20 +647,7 @@
                         /*
                          * صورة المنتج
                          */
-                            $productImage = $item['image'] ?? null;
-
-                            if ($productImage) {
-
-                                if (
-                                    !str_starts_with($productImage, 'http://') &&
-                                    !str_starts_with($productImage, 'https://')
-                                ) {
-
-                                    $productImage = asset(
-                                        'storage/' . ltrim($productImage, '/')
-                                    );
-                                }
-                            }
+                        $productImage = $item['image'] ?? null;
 
                         /*
                          * وصف المنتج
