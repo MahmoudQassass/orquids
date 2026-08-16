@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Country extends Model
 {
@@ -17,8 +16,13 @@ class Country extends Model
         'active' => 'boolean',
     ];
 
-    public function products(): BelongsToMany
+    public function products()
     {
         return $this->belongsToMany(Product::class);
+    }
+
+    public function shippingAddresses()
+    {
+        return $this->hasMany(ShippingAddress::class);
     }
 }

@@ -647,10 +647,20 @@
                         /*
                          * صورة المنتج
                          */
-                        $productImage = is_object($product)
-                            ? ($product->image ?? '')
-                            : ($product['image'] ?? '');
+                            $productImage = $item['image'] ?? null;
 
+                            if ($productImage) {
+
+                                if (
+                                    !str_starts_with($productImage, 'http://') &&
+                                    !str_starts_with($productImage, 'https://')
+                                ) {
+
+                                    $productImage = asset(
+                                        'storage/' . ltrim($productImage, '/')
+                                    );
+                                }
+                            }
 
                         /*
                          * وصف المنتج
@@ -776,35 +786,36 @@
                             {{-- IMAGE --}}
                             <div class="product-image">
 
-                                @if($productImage)
+                            @if($productImage)
 
-                                    <img
-                                        src="{{ $productImage }}"
-                                        alt="{{ $productName }}"
-                                    >
+                                <img
+                                    src="{{ $productImage }}"
+                                    alt="{{ $productName }}"
+                                    loading="lazy"
+                                >
 
-                                @else
+                            @else
 
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-12 w-12 text-[var(--purple)] opacity-50"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="1.2"
-                                    >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-12 w-12 text-[var(--purple)] opacity-50"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    stroke-width="1.2"
+                                >
 
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 6h16v12H4z"
-                                        />
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 6h16v12H4z"
+                                    />
 
-                                    </svg>
+                                </svg>
 
-                                @endif
+                            @endif
 
-                            </div>
+                        </div>
 
 
                             {{-- DETAILS --}}

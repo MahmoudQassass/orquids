@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\User;
 use App\Services\PayTabsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\CartItem;
 
 class PaymentController extends Controller
 {
@@ -41,9 +43,9 @@ class PaymentController extends Controller
                 ['token' => $order->payment_token]
             );
 
-            $callbackUrl = route(
-                'payment.callback'
-            );
+            // $callbackUrl = route(
+            //     'payment.callback'
+            // );
 
 
             /*
@@ -52,44 +54,44 @@ class PaymentController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $payment = $payTabs->createPayment(
+            // $payment = $payTabs->createPayment(
 
-                cartId: 'ORDER-' . $order->id,
+            //     cartId: 'ORDER-' . $order->id,
 
-                amount: (float) $order->total,
+            //     amount: (float) $order->total,
 
-                customer: [
+            //     customer: [
 
-                    'name' =>
-                        $order->customer_name,
+            //         'name' =>
+            //             $order->customer_name,
 
-                    'email' =>
-                        $order->email
-                        ?: 'customer@example.com',
+            //         'email' =>
+            //             $order->email
+            //             ?: 'customer@example.com',
 
-                    'phone' =>
-                        $order->phone,
+            //         'phone' =>
+            //             $order->phone,
 
-                    'address' =>
-                        $order->address ?? '',
+            //         'address' =>
+            //             $order->address ?? '',
 
-                    'city' =>
-                        $order->city ?? '',
+            //         'city' =>
+            //             $order->city ?? '',
 
-                    'state' =>
-                        '',
+            //         'state' =>
+            //             '',
 
-                    'country' =>
-                        $order->country ?? '',
+            //         'country' =>
+            //             $order->country ?? '',
 
-                    'zip' =>
-                        $order->zip ?? '',
-                ],
+            //         'zip' =>
+            //             $order->zip ?? '',
+            //     ],
 
-                returnUrl: $returnUrl,
+            //     returnUrl: $returnUrl,
 
-                callbackUrl: $callbackUrl
-            );
+            //     callbackUrl: $callbackUrl
+            // );
 
 
             /*
@@ -98,33 +100,34 @@ class PaymentController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            if (!empty($payment['tran_ref'])) {
+            // if (!empty($payment['tran_ref'])) {
 
-                $order->update([
-                    'payment_reference' =>
-                        $payment['tran_ref'],
-                ]);
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Redirect to PayTabs
-            |--------------------------------------------------------------------------
-            */
-
-            if (empty($payment['redirect_url'])) {
-
-                throw new \RuntimeException(
-                    'PayTabs did not return redirect_url.'
-                );
-            }
+            //     $order->update([
+            //         'payment_reference' =>
+            //             $payment['tran_ref'],
+            //     ]);
+            // }
 
 
-            return redirect()->away(
-                $payment['redirect_url']
-            );
+            // /*
+            // |--------------------------------------------------------------------------
+            // | Redirect to PayTabs
+            // |--------------------------------------------------------------------------
+            // */
 
+            // if (empty($payment['redirect_url'])) {
+
+            //     throw new \RuntimeException(
+            //         'PayTabs did not return redirect_url.'
+            //     );
+            // }
+
+
+            // return redirect()->away(
+            //     $payment['redirect_url']
+            // );
+
+            return redirect()->route('test.payment',$order);
 
         } catch (\Throwable $e) {
 
@@ -137,16 +140,26 @@ class PaymentController extends Controller
             );
 
 
-            return redirect()
+
+            // return redirect()
+            //     ->route(
+            //         'payment.result',
+            //         $order
+            //     )
+            //     ->with(
+            //         'error',
+            //         'حدث خطأ أثناء إنشاء عملية الدفع. يرجى المحاولة مرة أخرى.'
+            //     );
+                 return redirect()
                 ->route(
-                    'payment.result',
-                    $order
-                )
+                    'test.payment.processing',)
                 ->with(
                     'error',
                     'حدث خطأ أثناء إنشاء عملية الدفع. يرجى المحاولة مرة أخرى.'
                 );
         }
+
+
     }
 
 
@@ -155,6 +168,12 @@ class PaymentController extends Controller
     | PayTabs Callback
     |--------------------------------------------------------------------------
     */
+
+    /*
+|--------------------------------------------------------------------------
+| PayTabs Callback
+|--------------------------------------------------------------------------
+*/
 
     public function callback(Request $request)
     {
@@ -175,8 +194,7 @@ class PaymentController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $cartId =
-            $payload['cart_id'] ?? null;
+        $cartId = $payload['cart_id'] ?? null;
 
 
         if (!$cartId) {
@@ -194,16 +212,14 @@ class PaymentController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $orderId =
-            str_replace(
-                'ORDER-',
-                '',
-                $cartId
-            );
+        $orderId = str_replace(
+            'ORDER-',
+            '',
+            $cartId
+        );
 
 
-        $order =
-            Order::find($orderId);
+        $order = Order::find($orderId);
 
 
         if (!$order) {
@@ -241,11 +257,17 @@ class PaymentController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Update Order
+        | Payment Status
         |--------------------------------------------------------------------------
         */
 
         if ($responseStatus === 'A') {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Payment Successful
+            |--------------------------------------------------------------------------
+            */
 
             $order->update([
 
@@ -273,12 +295,19 @@ class PaymentController extends Controller
 
         } else {
 
+            /*
+            |--------------------------------------------------------------------------
+            | Payment Failed
+            |--------------------------------------------------------------------------
+            */
+
             $order->update([
 
                 'payment_status' =>
                     'failed',
 
-                'status' =>  'cancelled',
+                'status' =>
+                    'cancelled',
 
                 'payment_reference' =>
                     $tranRef,
@@ -301,6 +330,102 @@ class PaymentController extends Controller
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Clear Cart
+        |--------------------------------------------------------------------------
+        |
+        | سواء كانت العملية:
+        |
+        | paid
+        | failed
+        |
+        | يتم تفريغ السلة.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Clear Session Cart
+        |--------------------------------------------------------------------------
+        */
+
+        session()->forget('cart');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Clear Coupon
+        |--------------------------------------------------------------------------
+        */
+
+        session()->forget(
+            'checkout_coupon_code'
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Clear Spin Visitor Token
+        |--------------------------------------------------------------------------
+        |
+        | إذا كان الـ spin coupon مرتبطًا بالمحاولة الحالية.
+        | يمكن إبقاؤه إذا كنت تستخدمه لأغراض أخرى.
+        |
+        */
+
+        // session()->forget('spin_visitor_token');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Clear Database Cart
+        |--------------------------------------------------------------------------
+        */
+
+        if ($order->user_id) {
+
+            CartItem::where(
+                'user_id',
+                $order->user_id
+            )->delete();
+
+
+            Log::info(
+                'Database cart cleared.',
+                [
+                    'user_id' =>
+                        $order->user_id,
+
+                    'order_id' =>
+                        $order->id,
+                ]
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Log Session Cart Clear
+        |--------------------------------------------------------------------------
+        */
+
+        Log::info(
+            'Session cart cleared.',
+            [
+                'order_id' =>
+                    $order->id,
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Response
+        |--------------------------------------------------------------------------
+        */
+
         return response()->json([
             'status' => true,
         ]);
@@ -313,18 +438,80 @@ class PaymentController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Result
+    |--------------------------------------------------------------------------
+    */
+
     public function result(
         Request $request,
         string $token
     ) {
+        /*
+        |--------------------------------------------------------------------------
+        | Find Order
+        |--------------------------------------------------------------------------
+        */
 
         $order = Order::where(
-                'payment_token',
-                $token
-            )->firstOrFail();
+            'payment_token',
+            $token
+        )->firstOrFail();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Restore Authenticated User
+        |--------------------------------------------------------------------------
+        |
+        | إذا كان الطلب تم إنشاؤه بواسطة مستخدم مسجل الدخول،
+        | نحافظ على تسجيل دخوله عند العودة من PayTabs.
+        |
+        */
+
+        if (
+            $order->user_id &&
+            !auth()->check()
+        ) {
+
+            $user = User::find(
+                $order->user_id
+            );
+
+
+            if ($user) {
+
+                auth()->login(
+                    $user,
+                    true
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Regenerate Session
+                |--------------------------------------------------------------------------
+                |
+                | نحافظ على Session جديدة وآمنة بعد تسجيل الدخول.
+                |
+                */
+
+                $request->session()->regenerate();
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | View
+        |--------------------------------------------------------------------------
+        */
+
         return view(
             'store.payment-result',
             compact('order')
         );
     }
+
 }

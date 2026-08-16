@@ -12,11 +12,56 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+
+
+    {{-- Basic SEO --}}
     <meta
         name="description"
         content="@yield('meta_description', 'أوركيدس — وجهتك لاكتشاف منتجات مميزة من علامات تجارية مختارة بعناية.')"
     >
 
+{{-- Open Graph --}}
+<meta property="og:title" content="@yield('og_title', 'أوركيدس')">
+
+<meta
+    property="og:description"
+    content="@yield('og_description', 'اكتشف منتجات أوركيدس المختارة بعناية.')"
+>
+
+<meta
+    property="og:image"
+    content="@yield('og_image', asset('assets/images/logo-or.png'))"
+>
+
+<meta
+    property="og:url"
+    content="@yield('og_url', url()->current())"
+>
+
+<meta property="og:type" content="@yield('og_type', 'website')">
+
+<meta property="og:site_name" content="أوركيدس">
+
+<meta property="og:locale" content="ar_AR">
+
+<meta property="og:image:alt" content="@yield('og_image_alt', 'أوركيدس')">
+
+<meta name="twitter:card" content="summary_large_image">
+
+<meta
+    name="twitter:title"
+    content="@yield('og_title', 'أوركيدس')"
+>
+
+<meta
+    name="twitter:description"
+    content="@yield('og_description', 'اكتشف منتجات أوركيدس المختارة بعناية.')"
+>
+
+<meta
+    name="twitter:image"
+    content="@yield('og_image', asset('assets/images/logo-or.png'))"
+>
     <title>
         @yield('title', 'أوركيدس — منتجات مميزة')
     </title>
@@ -436,11 +481,6 @@
 
 
                 {{-- Cart --}}
-                @php
-                    $cart = session('cart', []);
-                    $cartCount = array_sum($cart);
-                @endphp
-
                 <a
                     href="{{ route('cart.index') }}"
                     class="relative flex h-11 w-11 items-center justify-center rounded-full border border-purple-200 bg-white text-[var(--purple)] transition hover:scale-105"

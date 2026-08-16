@@ -4,7 +4,7 @@
 
 @section('content')
 
-<section class="min-h-[80vh] bg-[var(--cream)] py-16">
+<section class="min-h-[80vh] bg-[var(--cream)] py-16 mt-10">
 
     <div class="mx-auto max-w-md px-5">
 

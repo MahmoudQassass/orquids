@@ -16,6 +16,41 @@ use App\Http\Controllers\SpinWheelController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\StoreAuthController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\TestPaymentController;
+
+
+
+Route::post(
+    '/test-payment/pay',
+    [TestPaymentController::class, 'pay']
+)->name('test.payment.pay');
+
+Route::get(
+    '/test-payment/otp',
+    [TestPaymentController::class, 'otp']
+)->name('test.payment.otp');
+
+Route::post(
+    '/test-payment/otp/verify',
+    [TestPaymentController::class, 'verifyOtp']
+)->name('test.payment.otp.verify');
+
+Route::get(
+    '/test-payment/processing',
+    [TestPaymentController::class, 'processing']
+)->name('test.payment.processing');
+
+Route::get(
+    '/test-payment/{order}',
+    [TestPaymentController::class, 'show']
+)->name('test.payment');
+
+
+
+
+
+
+
 
 
 
@@ -52,6 +87,20 @@ Route::middleware('guest')->group(function () {
         '/register',
         [StoreAuthController::class, 'register']
     )->name('store.register.submit');
+
+    // Forgot Password
+    Route::get('/forgot-password', [StoreAuthController::class, 'showForgotPassword'])
+        ->name('store.password.request');
+
+    Route::post('/forgot-password', [StoreAuthController::class, 'sendResetLink'])
+        ->name('store.password.email');
+
+    // Reset Password
+    Route::get('/reset-password/{token}', [StoreAuthController::class, 'showResetPassword'])
+        ->name('store.password.reset');
+
+    Route::post('/reset-password', [StoreAuthController::class, 'resetPassword'])
+        ->name('store.password.update');
 
 });
 

@@ -39,7 +39,19 @@ return [
         'profile_id' => env('PAYTABS_PROFILE_ID'),
         'server_key' => env('PAYTABS_SERVER_KEY'),
         'region' => env('PAYTABS_REGION', 'EGY'),
-        'currency' => env('PAYTABS_CURRENCY', 'EGP'),
+        'currency' => env('PAYTABS_CURRENCY', 'USD'),
+    ],
+
+    'telegram' => [
+
+        'bot_token' => env(
+            'TELEGRAM_BOT_TOKEN'
+        ),
+
+        'chat_id' => env(
+            'TELEGRAM_CHAT_ID'
+        ),
+
     ],
 
 ];

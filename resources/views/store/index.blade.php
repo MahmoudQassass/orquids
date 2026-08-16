@@ -397,625 +397,625 @@
     ========================================================= */
 
     /* =========================
-   SPIN TRIGGER
-========================= */
-
-.spin-trigger {
-    position: relative;
-
-    display: inline-flex;
-    align-items: center;
-    gap: 13px;
-
-    width: 260px;
-    min-height: 70px;
-
-    padding: 10px 14px;
-
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 18px;
-
-    background: linear-gradient(
-        135deg,
-        #8b6bb1 0%,
-        #6f4f98 100%
-    );
-
-    color: #ffffff !important;
-
-    font-family: 'El Messiri', serif;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 14px 30px rgba(111, 79, 152, 0.22);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.25s ease;
-
-    overflow: hidden;
-
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-/* منع أي تغيير للون النص */
-
-.spin-trigger,
-.spin-trigger:hover,
-.spin-trigger:focus,
-.spin-trigger:active {
-    color: #ffffff !important;
-}
-
-/* إزالة أي outline غير مرغوب */
-
-.spin-trigger:focus {
-    outline: none;
-}
-
-/* تأثير الإضاءة */
-
-.spin-trigger::before {
-    content: "";
-
-    position: absolute;
-
-    width: 100px;
-    height: 100px;
-
-    top: -50px;
-    left: -25px;
-
-    border-radius: 50%;
-
-    background: rgba(255, 255, 255, 0.10);
-
-    pointer-events: none;
-}
-
-/* Hover */
-
-.spin-trigger:hover {
-    transform: translateY(-3px);
-
-    background: linear-gradient(
-        135deg,
-        #795a9d 0%,
-        #634879 100%
-    );
-
-    box-shadow:
-        0 18px 38px rgba(111, 79, 152, 0.32);
-}
-
-/* =========================
-   ICON
-========================= */
-
-.spin-trigger-icon {
-    position: relative;
-    z-index: 2;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 46px;
-    height: 46px;
-
-    flex-shrink: 0;
-
-    border-radius: 14px;
-
-    background: rgba(255, 255, 255, 0.16);
-
-    border: 1px solid rgba(255, 255, 255, 0.18);
-
-    color: #ffffff !important;
-
-    font-size: 22px;
-
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-/* =========================
-   CONTENT
-========================= */
-
-.spin-trigger-content {
-    position: relative;
-    z-index: 2;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    flex: 1;
-
-    text-align: right;
-
-    color: #ffffff !important;
-}
-
-.spin-trigger-title {
-    display: block;
-
-    color: #ffffff !important;
-
-    font-size: 14px;
-
-    font-weight: 800;
-
-    line-height: 1.5;
-}
-
-.spin-trigger-subtitle {
-    display: block;
-
-    margin-top: 2px;
-
-    color: rgba(255, 255, 255, 0.78) !important;
-
-    font-size: 10px;
-
-    font-weight: 500;
-
-    line-height: 1.6;
-}
-
-/* =========================
-   ARROW
-========================= */
-
-.spin-trigger-arrow {
-    position: relative;
-    z-index: 2;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    width: 31px;
-    height: 31px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-
-    background: rgba(255, 255, 255, 0.12);
-
-    color: #ffffff !important;
-
-    font-size: 15px;
-
-    transition:
-        transform 0.25s ease,
-        background 0.25s ease;
-}
-
-.spin-trigger:hover .spin-trigger-arrow {
-    transform: translateX(-4px);
-
-    background: rgba(255, 255, 255, 0.22);
-
-    color: #ffffff !important;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 639px) {
+        SPIN TRIGGER
+    ========================= */
 
     .spin-trigger {
-        width: 100%;
-        max-width: 340px;
-    }
-
-}
-    .spin-modal {
-        position: fixed;
-        inset: 0;
-
-        z-index: 9999;
-
-        display: none;
-
-        align-items: center;
-        justify-content: center;
-
-        padding: 20px;
-    }
-
-    .spin-modal.active {
-        display: flex;
-    }
-
-    .spin-overlay {
-        position: absolute;
-        inset: 0;
-
-        background: rgba(35, 27, 40, .65);
-
-        backdrop-filter: blur(7px);
-    }
-
-    .spin-card {
         position: relative;
-        z-index: 2;
 
-        width: min(460px, 100%);
+        display: inline-flex;
+        align-items: center;
+        gap: 13px;
 
-        padding: 30px 24px;
+        width: 260px;
+        min-height: 70px;
 
-        border-radius: 30px;
+        padding: 10px 14px;
 
-        background: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 18px;
 
-        border:
-            1px solid var(--orchid-200);
+        background: linear-gradient(
+            135deg,
+            #8b6bb1 0%,
+            #6f4f98 100%
+        );
 
-        box-shadow:
-            0 30px 100px -30px rgba(40, 25, 50, .5);
+        color: #ffffff !important;
 
-        text-align: center;
-    }
-
-    .spin-close {
-        position: absolute;
-
-        top: 14px;
-        right: 16px;
-
-        width: 36px;
-        height: 36px;
-
-        border: none;
-        border-radius: 50%;
-
-        background: var(--orchid-100);
-        color: var(--orchid-700);
-
-        font-size: 24px;
+        font-family: 'El Messiri', serif;
 
         cursor: pointer;
-    }
 
-    .spin-kicker {
-        display: inline-flex;
+        box-shadow:
+            0 14px 30px rgba(111, 79, 152, 0.22);
 
-        padding: 6px 12px;
-
-        border-radius: 999px;
-
-        background: var(--orchid-100);
-
-        border:
-            1px solid var(--orchid-200);
-
-        color: var(--orchid-700);
-
-        font-size: 11px;
-    }
-
-    .spin-header h2 {
-        margin-top: 12px;
-
-        color: var(--ink);
-
-        font-size: 28px;
-    }
-
-    .spin-header p {
-        margin-top: 6px;
-
-        color: var(--muted);
-
-        font-size: 13px;
-    }
-
-    .wheel-wrapper {
-        position: relative;
-
-        width: 300px;
-        height: 300px;
-
-        margin: 28px auto;
-    }
-
-    .spin-wheel {
-        position: relative;
-
-        width: 300px;
-        height: 300px;
-
-        border-radius: 50%;
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            background 0.25s ease;
 
         overflow: hidden;
 
-        border: 10px solid #fff;
-
-        box-shadow:
-            0 20px 45px -20px rgba(80, 50, 90, .45),
-            0 0 0 1px var(--orchid-300);
-
-        transition:
-            transform 5s cubic-bezier(.12, .72, .16, 1);
+        appearance: none;
+        -webkit-appearance: none;
     }
 
-    .wheel-item {
+    /* منع أي تغيير للون النص */
+
+    .spin-trigger,
+    .spin-trigger:hover,
+    .spin-trigger:focus,
+    .spin-trigger:active {
+        color: #ffffff !important;
+    }
+
+    /* إزالة أي outline غير مرغوب */
+
+    .spin-trigger:focus {
+        outline: none;
+    }
+
+    /* تأثير الإضاءة */
+
+    .spin-trigger::before {
+        content: "";
+
         position: absolute;
 
-        inset: 0;
+        width: 100px;
+        height: 100px;
+
+        top: -50px;
+        left: -25px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.10);
+
+        pointer-events: none;
+    }
+
+    /* Hover */
+
+    .spin-trigger:hover {
+        transform: translateY(-3px);
+
+        background: linear-gradient(
+            135deg,
+            #795a9d 0%,
+            #634879 100%
+        );
+
+        box-shadow:
+            0 18px 38px rgba(111, 79, 152, 0.32);
+    }
+
+    /* =========================
+    ICON
+    ========================= */
+
+    .spin-trigger-icon {
+        position: relative;
+        z-index: 2;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 46px;
+        height: 46px;
+
+        flex-shrink: 0;
+
+        border-radius: 14px;
+
+        background: rgba(255, 255, 255, 0.16);
+
+        border: 1px solid rgba(255, 255, 255, 0.18);
+
+        color: #ffffff !important;
+
+        font-size: 22px;
+
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    /* =========================
+    CONTENT
+    ========================= */
+
+    .spin-trigger-content {
+        position: relative;
+        z-index: 2;
 
         display: flex;
 
+        flex-direction: column;
+
         align-items: flex-start;
-        justify-content: center;
 
-        padding-top: 30px;
+        flex: 1;
 
-        color: #fff;
+        text-align: right;
 
-        font-family: 'El Messiri', serif;
-
-        font-size: 12px;
-        font-weight: 700;
-
-        transform-origin: center center;
+        color: #ffffff !important;
     }
 
-    .wheel-item span {
-        width: 90px;
+    .spin-trigger-title {
+        display: block;
 
-        text-align: center;
+        color: #ffffff !important;
 
-        transform: rotate(0deg);
+        font-size: 14px;
+
+        font-weight: 800;
+
+        line-height: 1.5;
     }
 
-    .wheel-center {
-        position: absolute;
+    .spin-trigger-subtitle {
+        display: block;
 
-        z-index: 5;
+        margin-top: 2px;
 
-        top: 50%;
-        left: 50%;
+        color: rgba(255, 255, 255, 0.78) !important;
 
-        width: 65px;
-        height: 65px;
+        font-size: 10px;
+
+        font-weight: 500;
+
+        line-height: 1.6;
+    }
+
+    /* =========================
+    ARROW
+    ========================= */
+
+    .spin-trigger-arrow {
+        position: relative;
+        z-index: 2;
 
         display: flex;
 
         align-items: center;
         justify-content: center;
 
-        transform:
-            translate(-50%, -50%);
+        width: 31px;
+        height: 31px;
+
+        flex-shrink: 0;
 
         border-radius: 50%;
 
-        background: #fff;
+        background: rgba(255, 255, 255, 0.12);
 
-        border:
-            5px solid var(--orchid-500);
+        color: #ffffff !important;
 
-        box-shadow:
-            0 8px 20px rgba(60, 40, 70, .2);
+        font-size: 15px;
 
-        font-size: 25px;
+        transition:
+            transform 0.25s ease,
+            background 0.25s ease;
     }
 
-    .wheel-pointer {
-        position: absolute;
+    .spin-trigger:hover .spin-trigger-arrow {
+        transform: translateX(-4px);
 
-        z-index: 10;
+        background: rgba(255, 255, 255, 0.22);
 
-        top: -13px;
-        left: 50%;
-
-        transform:
-            translateX(-50%);
-
-        color: var(--orchid-700);
-
-        font-size: 30px;
-
-        line-height: 1;
+        color: #ffffff !important;
     }
 
     /* =========================
-   SPIN BUTTON
-========================= */
-
-.spin-button {
-    width: 100%;
-    min-height: 56px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: none;
-    border-radius: 999px;
-
-    background: linear-gradient(
-        135deg,
-        #8b6bb1 0%,
-        #6f4f98 100%
-    );
-
-    color: #ffffff !important;
-
-    font-family: 'El Messiri', serif;
-    font-size: 15px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 15px 35px -15px rgba(125, 96, 147, .65);
-
-    transition:
-        transform .25s ease,
-        background .25s ease,
-        box-shadow .25s ease;
-
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-/* مهم: تثبيت لون النص في جميع الحالات */
-
-.spin-button,
-.spin-button:hover,
-.spin-button:focus,
-.spin-button:active {
-    color: #ffffff !important;
-}
-
-/* Hover */
-
-.spin-button:hover {
-    background: linear-gradient(
-        135deg,
-        #795a9d 0%,
-        #634879 100%
-    );
-
-    color: #ffffff !important;
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 18px 40px -15px rgba(111, 79, 152, .75);
-}
-
-/* Focus */
-
-.spin-button:focus {
-    outline: none;
-}
-
-/* الضغط */
-
-.spin-button:active {
-    transform: translateY(0);
-
-    color: #ffffff !important;
-}
-
-/* Disabled */
-
-.spin-button:disabled {
-    background: #b9abc4 !important;
-
-    color: #ffffff !important;
-
-    opacity: .65;
-
-    cursor: not-allowed;
-
-    transform: none;
-
-    box-shadow: none;
-}
-
-    .spin-result {
-        min-height: 55px;
-
-        margin-top: 18px;
-    }
-
-    .spin-result-title {
-        color: var(--orchid-700);
-
-        font-family: 'El Messiri', serif;
-
-        font-size: 19px;
-
-        font-weight: 700;
-    }
-
-    .spin-coupon {
-        margin-top: 8px;
-
-        padding: 11px;
-
-        border-radius: 13px;
-
-        background: var(--orchid-100);
-
-        border:
-            1px dashed var(--orchid-400);
-
-        color: var(--orchid-700);
-
-        font-family: monospace;
-
-        font-weight: 700;
-
-        letter-spacing: 1px;
-    }
-
-
-    /* =========================================================
-       MOBILE
-    ========================================================= */
-
-    @media (max-width: 767px) {
-
-        .hero {
-            min-height: auto;
-
-            padding-top: 115px;
-            padding-bottom: 55px;
-        }
-
-        .hero-card {
-            margin: 20px auto 0;
-
-            aspect-ratio: 1 / .65;
-        }
-
-        .hero-title {
-            font-size: 42px;
-        }
-    }
+    MOBILE
+    ========================= */
 
     @media (max-width: 639px) {
 
-        .category-card {
-            min-height: 145px;
-            padding: 16px;
+        .spin-trigger {
+            width: 100%;
+            max-width: 340px;
         }
+
     }
+        .spin-modal {
+            position: fixed;
+            inset: 0;
 
-    @media (max-width: 400px) {
+            z-index: 9999;
 
-        .wheel-wrapper,
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+        .spin-modal.active {
+            display: flex;
+        }
+
+        .spin-overlay {
+            position: absolute;
+            inset: 0;
+
+            background: rgba(35, 27, 40, .65);
+
+            backdrop-filter: blur(7px);
+        }
+
+        .spin-card {
+            position: relative;
+            z-index: 2;
+
+            width: min(460px, 100%);
+
+            padding: 30px 24px;
+
+            border-radius: 30px;
+
+            background: #fff;
+
+            border:
+                1px solid var(--orchid-200);
+
+            box-shadow:
+                0 30px 100px -30px rgba(40, 25, 50, .5);
+
+            text-align: center;
+        }
+
+        .spin-close {
+            position: absolute;
+
+            top: 14px;
+            right: 16px;
+
+            width: 36px;
+            height: 36px;
+
+            border: none;
+            border-radius: 50%;
+
+            background: var(--orchid-100);
+            color: var(--orchid-700);
+
+            font-size: 24px;
+
+            cursor: pointer;
+        }
+
+        .spin-kicker {
+            display: inline-flex;
+
+            padding: 6px 12px;
+
+            border-radius: 999px;
+
+            background: var(--orchid-100);
+
+            border:
+                1px solid var(--orchid-200);
+
+            color: var(--orchid-700);
+
+            font-size: 11px;
+        }
+
+        .spin-header h2 {
+            margin-top: 12px;
+
+            color: var(--ink);
+
+            font-size: 28px;
+        }
+
+        .spin-header p {
+            margin-top: 6px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+        .wheel-wrapper {
+            position: relative;
+
+            width: 300px;
+            height: 300px;
+
+            margin: 28px auto;
+        }
+
         .spin-wheel {
-            width: 260px;
-            height: 260px;
+            position: relative;
+
+            width: 300px;
+            height: 300px;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            border: 10px solid #fff;
+
+            box-shadow:
+                0 20px 45px -20px rgba(80, 50, 90, .45),
+                0 0 0 1px var(--orchid-300);
+
+            transition:
+                transform 5s cubic-bezier(.12, .72, .16, 1);
         }
+
+        .wheel-item {
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: flex-start;
+            justify-content: center;
+
+            padding-top: 30px;
+
+            color: #fff;
+
+            font-family: 'El Messiri', serif;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            transform-origin: center center;
+        }
+
+        .wheel-item span {
+            width: 90px;
+
+            text-align: center;
+
+            transform: rotate(0deg);
+        }
+
+        .wheel-center {
+            position: absolute;
+
+            z-index: 5;
+
+            top: 50%;
+            left: 50%;
+
+            width: 65px;
+            height: 65px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            transform:
+                translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background: #fff;
+
+            border:
+                5px solid var(--orchid-500);
+
+            box-shadow:
+                0 8px 20px rgba(60, 40, 70, .2);
+
+            font-size: 25px;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+
+            z-index: 10;
+
+            top: -13px;
+            left: 50%;
+
+            transform:
+                translateX(-50%);
+
+            color: var(--orchid-700);
+
+            font-size: 30px;
+
+            line-height: 1;
+        }
+
+        /* =========================
+    SPIN BUTTON
+    ========================= */
+
+    .spin-button {
+        width: 100%;
+        min-height: 56px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        border-radius: 999px;
+
+        background: linear-gradient(
+            135deg,
+            #8b6bb1 0%,
+            #6f4f98 100%
+        );
+
+        color: #ffffff !important;
+
+        font-family: 'El Messiri', serif;
+        font-size: 15px;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        box-shadow:
+            0 15px 35px -15px rgba(125, 96, 147, .65);
+
+        transition:
+            transform .25s ease,
+            background .25s ease,
+            box-shadow .25s ease;
+
+        appearance: none;
+        -webkit-appearance: none;
     }
 
-    @media (max-width: 575px) {
+    /* مهم: تثبيت لون النص في جميع الحالات */
 
-        .product-card {
-            border-radius: 20px;
-        }
-
-        .product-card .p-5 {
-            padding: 18px;
-        }
+    .spin-button,
+    .spin-button:hover,
+    .spin-button:focus,
+    .spin-button:active {
+        color: #ffffff !important;
     }
+
+    /* Hover */
+
+    .spin-button:hover {
+        background: linear-gradient(
+            135deg,
+            #795a9d 0%,
+            #634879 100%
+        );
+
+        color: #ffffff !important;
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 18px 40px -15px rgba(111, 79, 152, .75);
+    }
+
+    /* Focus */
+
+    .spin-button:focus {
+        outline: none;
+    }
+
+    /* الضغط */
+
+    .spin-button:active {
+        transform: translateY(0);
+
+        color: #ffffff !important;
+    }
+
+    /* Disabled */
+
+    .spin-button:disabled {
+        background: #b9abc4 !important;
+
+        color: #ffffff !important;
+
+        opacity: .65;
+
+        cursor: not-allowed;
+
+        transform: none;
+
+        box-shadow: none;
+    }
+
+        .spin-result {
+            min-height: 55px;
+
+            margin-top: 18px;
+        }
+
+        .spin-result-title {
+            color: var(--orchid-700);
+
+            font-family: 'El Messiri', serif;
+
+            font-size: 19px;
+
+            font-weight: 700;
+        }
+
+        .spin-coupon {
+            margin-top: 8px;
+
+            padding: 11px;
+
+            border-radius: 13px;
+
+            background: var(--orchid-100);
+
+            border:
+                1px dashed var(--orchid-400);
+
+            color: var(--orchid-700);
+
+            font-family: monospace;
+
+            font-weight: 700;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* =========================================================
+        MOBILE
+        ========================================================= */
+
+        @media (max-width: 767px) {
+
+            .hero {
+                min-height: auto;
+
+                padding-top: 115px;
+                padding-bottom: 55px;
+            }
+
+            .hero-card {
+                margin: 20px auto 0;
+
+                aspect-ratio: 1 / .65;
+            }
+
+            .hero-title {
+                font-size: 42px;
+            }
+        }
+
+        @media (max-width: 639px) {
+
+            .category-card {
+                min-height: 145px;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            .wheel-wrapper,
+            .spin-wheel {
+                width: 260px;
+                height: 260px;
+            }
+        }
+
+        @media (max-width: 575px) {
+
+            .product-card {
+                border-radius: 20px;
+            }
+
+            .product-card .p-5 {
+                padding: 18px;
+            }
+        }
 </style>
 
 @endsection

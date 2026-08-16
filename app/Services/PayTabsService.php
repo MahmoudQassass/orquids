@@ -31,7 +31,7 @@ class PayTabsService
 
         $this->currency = config(
             'services.paytabs.currency',
-            'EGP'
+            'USD'
         );
 
         $this->baseUrl = $this->getBaseUrl();

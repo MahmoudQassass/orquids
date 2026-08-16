@@ -4,7 +4,7 @@
 
 @section('content')
 
-<section class="min-h-[80vh] bg-[var(--cream)] py-16">
+<section class="min-h-[80vh] bg-[var(--cream)] py-16 mt-10">
 
     <div class="mx-auto max-w-md px-5">
 
@@ -38,6 +38,43 @@
                         </p>
 
                     @endforeach
+
+                </div>
+
+            @endif
+
+            @if(session('status'))
+
+                <div class="mb-5 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+
+                    <div class="flex items-center gap-2">
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            class="h-5 w-5 shrink-0"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 12.75L11.25 15 15 9.75"
+                            />
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+
+                        <span>
+                            {{ session('status') }}
+                        </span>
+
+                    </div>
 
                 </div>
 
@@ -91,6 +128,17 @@
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-[var(--purple)] focus:ring-2 focus:ring-purple-100"
                         placeholder="أدخل كلمة المرور"
                     >
+
+                </div>
+
+                <div class="mt-2 text-left">
+
+                    <a
+                        href="{{ route('store.password.request') }}"
+                        class="text-xs font-bold text-[var(--purple)] transition hover:text-[var(--purple-dark)]"
+                    >
+                        نسيت كلمة المرور؟
+                    </a>
 
                 </div>
 

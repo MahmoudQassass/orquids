@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Coupon;
+use App\Models\CartItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -129,19 +130,88 @@ class StoreController extends Controller
      * صفحة Checkout
      * ============================================================
      */
+    /**
+     * ============================================================
+     * صفحة Checkout
+     * ============================================================
+     */
     public function showCheckout()
     {
         /*
         |--------------------------------------------------------------------------
         | Cart
         |--------------------------------------------------------------------------
+        |
+        | Guest:
+        |   Session Cart
+        |
+        | Logged-in User:
+        |   Database Cart
+        |
+        | ملاحظة:
+        | عند تسجيل الدخول يجب أن تكون السلة قد تم دمجها مسبقًا
+        | من Session إلى cart_items.
+        |
         */
 
-        $cart = session()->get('cart', []);
+        $cart = [];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Guest Cart
+        |--------------------------------------------------------------------------
+        */
+
+        if (!auth()->check()) {
+
+            $cart = session()->get('cart', []);
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Authenticated User Cart
+        |--------------------------------------------------------------------------
+        */
+
+        else {
+
+            $cartItems = CartItem::where(
+                'user_id',
+                auth()->id()
+            )->get();
+
+
+            foreach ($cartItems as $cartItem) {
+
+                $productId = (int) $cartItem->product_id;
+
+                $quantity = (int) $cartItem->quantity;
+
+
+                if ($productId <= 0 || $quantity <= 0) {
+                    continue;
+                }
+
+
+                $cart[$productId] = $quantity;
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Empty Cart
+        |--------------------------------------------------------------------------
+        */
 
         if (empty($cart)) {
 
-            session()->forget('checkout_coupon_code');
+            session()->forget(
+                'checkout_coupon_code'
+            );
 
             return redirect()
                 ->route('store.index')
@@ -167,10 +237,37 @@ class StoreController extends Controller
             ->get();
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | No Available Products
+        |--------------------------------------------------------------------------
+        */
+
         if ($products->isEmpty()) {
 
-            session()->forget('cart');
-            session()->forget('checkout_coupon_code');
+            /*
+            |--------------------------------------------------------------------------
+            | Remove Invalid Cart
+            |--------------------------------------------------------------------------
+            */
+
+            if (auth()->check()) {
+
+                CartItem::where(
+                    'user_id',
+                    auth()->id()
+                )->delete();
+
+            } else {
+
+                session()->forget('cart');
+            }
+
+
+            session()->forget(
+                'checkout_coupon_code'
+            );
+
 
             return redirect()
                 ->route('store.index')
@@ -195,6 +292,12 @@ class StoreController extends Controller
 
 
         foreach ($products as $product) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Quantity
+            |--------------------------------------------------------------------------
+            */
 
             $quantity = (int) (
                 $cart[$product->id] ?? 0
@@ -231,10 +334,22 @@ class StoreController extends Controller
             );
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Totals
+            |--------------------------------------------------------------------------
+            */
+
             $subtotal += $itemSubtotal;
 
             $cartCount += $quantity;
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Item
+            |--------------------------------------------------------------------------
+            */
 
             $items[] = [
 
@@ -245,6 +360,7 @@ class StoreController extends Controller
                 'price' => $price,
 
                 'subtotal' => $itemSubtotal,
+
             ];
         }
 
@@ -255,10 +371,34 @@ class StoreController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (empty($items) || $subtotal <= 0) {
+        if (
+            empty($items) ||
+            $subtotal <= 0
+        ) {
 
-            session()->forget('cart');
-            session()->forget('checkout_coupon_code');
+            /*
+            |--------------------------------------------------------------------------
+            | Clear Cart
+            |--------------------------------------------------------------------------
+            */
+
+            if (auth()->check()) {
+
+                CartItem::where(
+                    'user_id',
+                    auth()->id()
+                )->delete();
+
+            } else {
+
+                session()->forget('cart');
+            }
+
+
+            session()->forget(
+                'checkout_coupon_code'
+            );
+
 
             return redirect()
                 ->route('store.index')
@@ -281,6 +421,7 @@ class StoreController extends Controller
 
         $total = $subtotal;
 
+
         $couponCode = session()->get(
             'checkout_coupon_code'
         );
@@ -294,10 +435,18 @@ class StoreController extends Controller
 
         if ($couponCode) {
 
+            /*
+            |--------------------------------------------------------------------------
+            | Find Coupon
+            |--------------------------------------------------------------------------
+            */
+
             $coupon = Coupon::query()
                 ->where(
                     'code',
-                    strtoupper(trim($couponCode))
+                    strtoupper(
+                        trim($couponCode)
+                    )
                 )
                 ->first();
 
@@ -331,14 +480,24 @@ class StoreController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            if ($coupon && $coupon->spin_attempt_id) {
+            if (
+                $coupon &&
+                $coupon->spin_attempt_id
+            ) {
 
                 $visitorToken = session()->get(
                     'spin_visitor_token'
                 );
 
+
                 $attempt = $coupon->spinAttempt;
 
+
+                /*
+                |--------------------------------------------------------------------------
+                | Validate Visitor
+                |--------------------------------------------------------------------------
+                */
 
                 if (
                     !$attempt ||
@@ -393,7 +552,7 @@ class StoreController extends Controller
 
                 /*
                 |--------------------------------------------------------------------------
-                | Same protection used by checkout / PayTabs
+                | Protect Percentage
                 |--------------------------------------------------------------------------
                 */
 
@@ -408,12 +567,8 @@ class StoreController extends Controller
 
                 /*
                 |--------------------------------------------------------------------------
-                | IMPORTANT
+                | Discount
                 |--------------------------------------------------------------------------
-                |
-                | الخصم يحسب من subtotal الحالي
-                | وليس من قيمة قديمة محفوظة.
-                |
                 */
 
                 $discount = round(
@@ -445,8 +600,38 @@ class StoreController extends Controller
 
         $currency = config(
             'services.paytabs.currency',
-            'EGP'
+            'USD'
         );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Countries
+        |--------------------------------------------------------------------------
+        */
+
+        $countries = Country::where(
+            'active',
+            true
+        )
+            ->orderBy('name')
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default Shipping Address
+        |--------------------------------------------------------------------------
+        */
+
+        $shippingAddress = null;
+
+
+        if (auth()->check()) {
+
+            $shippingAddress = auth()->user()
+                ->defaultShippingAddress;
+        }
 
 
         /*
@@ -454,10 +639,6 @@ class StoreController extends Controller
         | View
         |--------------------------------------------------------------------------
         */
-
-        $countries = Country::where('active', true)
-            ->orderBy('name')
-            ->get();
 
         return view(
             'store.checkout',
@@ -469,7 +650,8 @@ class StoreController extends Controller
                 'discount',
                 'total',
                 'currency',
-                'countries'
+                'countries',
+                'shippingAddress'
             )
         );
     }
@@ -826,131 +1008,347 @@ class StoreController extends Controller
     }
 
 
-    /**
-     * ============================================================
-     * إنشاء الطلب
-     * ============================================================
-     */
-    public function checkout(Request $request)
-    {
-        /*
-        |--------------------------------------------------------------------------
-        | Validation
-        |--------------------------------------------------------------------------
-        */
+/**
+ * ============================================================
+ * إنشاء الطلب
+ * ============================================================
+ */
+public function checkout(Request $request)
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
 
-        $validated = $request->validate([
+    $validated = $request->validate([
 
-            'customer_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+        'customer_name' => [
+            'required',
+            'string',
+            'max:255',
+        ],
 
-            'phone' => [
-                'required',
-                'string',
-                'max:30',
-            ],
+        'phone' => [
+            'required',
+            'string',
+            'max:30',
+        ],
 
-            'email' => [
-                'nullable',
-                'email',
-                'max:255',
-            ],
+        'email' => [
+            'nullable',
+            'email',
+            'max:255',
+        ],
 
-            'country' => [
-                'required',
-                'exists:countries,id',
-            ],
-            'city' => [
-                'required',
-                'string',
-                'max:100',
-            ],
+        'country' => [
+            'required',
+            'exists:countries,id',
+        ],
 
-            'zip' => [
-                'required',
-                'string',
-                'max:100',
-            ],
+        'city' => [
+            'required',
+            'string',
+            'max:100',
+        ],
 
-            'address' => [
-                'required',
-                'string',
-                'max:1000',
-            ],
-        ]);
+        'zip' => [
+            'required',
+            'string',
+            'max:100',
+        ],
+
+        'address' => [
+            'required',
+            'string',
+            'max:1000',
+        ],
+    ]);
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Cart
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | Cart
+    |--------------------------------------------------------------------------
+    |
+    | Guest:
+    |   Session Cart
+    |
+    | Authenticated:
+    |   Database Cart
+    |
+    */
+
+    $cart = [];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Guest Cart
+    |--------------------------------------------------------------------------
+    */
+
+    if (!auth()->check()) {
 
         $cart = session()->get(
             'cart',
             []
         );
+    }
 
 
-        if (empty($cart)) {
+    /*
+    |--------------------------------------------------------------------------
+    | Authenticated User Cart
+    |--------------------------------------------------------------------------
+    */
 
-            return redirect()
-                ->route('store.index')
-                ->with(
-                    'error',
-                    'سلة التسوق فارغة.'
-                );
+    else {
+
+        $cartItems = CartItem::where(
+            'user_id',
+            auth()->id()
+        )->get();
+
+
+        foreach ($cartItems as $cartItem) {
+
+            $productId = (int) $cartItem->product_id;
+
+            $quantity = (int) $cartItem->quantity;
+
+
+            if (
+                $productId <= 0 ||
+                $quantity <= 0
+            ) {
+                continue;
+            }
+
+
+            $cart[$productId] = $quantity;
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Empty Cart
+    |--------------------------------------------------------------------------
+    */
+
+    if (empty($cart)) {
+
+        session()->forget(
+            'checkout_coupon_code'
+        );
+
+
+        return redirect()
+            ->route('store.index')
+            ->with(
+                'error',
+                'سلة التسوق فارغة.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Products
+    |--------------------------------------------------------------------------
+    */
+
+    $products = Product::whereIn(
+        'id',
+        array_keys($cart)
+    )
+        ->where('status', true)
+        ->with('countries:id')
+        ->get();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Products Not Found
+    |--------------------------------------------------------------------------
+    */
+
+    if ($products->isEmpty()) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Clear Cart
+        |--------------------------------------------------------------------------
+        */
+
+        if (auth()->check()) {
+
+            CartItem::where(
+                'user_id',
+                auth()->id()
+            )->delete();
+
+        } else {
+
+            session()->forget('cart');
+        }
+
+
+        session()->forget(
+            'checkout_coupon_code'
+        );
+
+
+        return redirect()
+            ->route('store.index')
+            ->with(
+                'error',
+                'المنتجات الموجودة في السلة غير متوفرة.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Check Shipping Availability
+    |--------------------------------------------------------------------------
+    */
+
+    $unavailableProducts = [];
+
+
+    foreach ($products as $product) {
+
+        $available = $product->countries
+            ->contains(
+                'id',
+                $validated['country']
+            );
+
+
+        if (!$available) {
+
+            $unavailableProducts[] =
+                $product->name;
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Unavailable Products
+    |--------------------------------------------------------------------------
+    */
+
+    if (!empty($unavailableProducts)) {
+
+        return back()
+            ->withInput()
+            ->withErrors([
+                'country' =>
+                    'عذرًا، المنتجات التالية غير متوفرة للشحن إلى الدولة المختارة: '
+                    . implode(
+                        '، ',
+                        $unavailableProducts
+                    ),
+            ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coupon
+    |--------------------------------------------------------------------------
+    */
+
+    $coupon = null;
+
+    $discount = 0;
+
+
+    $couponCode = session()->get(
+        'checkout_coupon_code'
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Transaction
+    |--------------------------------------------------------------------------
+    */
+
+    $order = DB::transaction(function () use (
+        $products,
+        $cart,
+        $validated,
+        $couponCode,
+        &$coupon,
+        &$discount
+    ) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Subtotal
+        |--------------------------------------------------------------------------
+        */
+
+        $subtotal = 0;
+
+        $totalQuantity = 0;
+
+
+        foreach ($products as $product) {
+
+            $quantity = (int) (
+                $cart[$product->id] ?? 0
+            );
+
+
+            if ($quantity <= 0) {
+                continue;
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Price
+            |--------------------------------------------------------------------------
+            */
+
+            $price = $product->discount_price
+                ?? $product->price;
+
+
+            $price = (float) $price;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Subtotal
+            |--------------------------------------------------------------------------
+            */
+
+            $subtotal +=
+                $price * $quantity;
+
+
+            $totalQuantity +=
+                $quantity;
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | Products
+        | Invalid Cart
         |--------------------------------------------------------------------------
         */
 
-        $products = Product::whereIn('id', array_keys($cart))
-            ->where('status', true)
-            ->with('countries:id')
-            ->get();
+        if ($subtotal <= 0) {
 
-        $unavailableProducts = [];
-
-        foreach ($products as $product) {
-
-            $available = $product->countries
-                ->contains('id', $request->country);
-
-            if (!$available) {
-                $unavailableProducts[] = $product->name;
-            }
-        }
-
-        if (!empty($unavailableProducts)) {
-
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'country' =>
-                        'عذرًا، المنتجات التالية غير متوفرة للشحن إلى الدولة المختارة: '
-                        . implode('، ', $unavailableProducts),
-                ]);
-        }
-
-
-        if ($products->isEmpty()) {
-
-            session()->forget('cart');
-
-            return redirect()
-                ->route('store.index')
-                ->with(
-                    'error',
-                    'المنتجات الموجودة في السلة غير متوفرة.'
-                );
+            throw new \RuntimeException(
+                'قيمة السلة غير صالحة.'
+            );
         }
 
 
@@ -960,203 +1358,414 @@ class StoreController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $coupon = null;
+        if ($couponCode) {
 
-        $discount = 0;
+            $coupon = Coupon::query()
+                ->where(
+                    'code',
+                    strtoupper(
+                        trim($couponCode)
+                    )
+                )
+                ->lockForUpdate()
+                ->first();
 
-        $couponCode = session()->get(
-            'checkout_coupon_code'
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Transaction
-        |--------------------------------------------------------------------------
-        */
-
-        $order = DB::transaction(function () use (
-            $products,
-            $cart,
-            $validated,
-            $couponCode,
-            &$coupon,
-            &$discount
-        ) {
 
             /*
             |--------------------------------------------------------------------------
-            | حساب Subtotal
+            | Coupon Validation
             |--------------------------------------------------------------------------
             */
 
-            $subtotal = 0;
-
-            $totalQuantity = 0;
-
-
-            foreach ($products as $product) {
-
-                $quantity = (int) (
-                    $cart[$product->id] ?? 0
-                );
-
-                if ($quantity <= 0) {
-                    continue;
-                }
-
-                $price = $product->discount_price
-                    ?? $product->price;
-
-                $subtotal +=
-                    $price * $quantity;
-
-                $totalQuantity += $quantity;
-            }
-
-
-            if ($subtotal <= 0) {
+            if (
+                !$coupon ||
+                $coupon->is_used ||
+                (
+                    $coupon->expires_at &&
+                    $coupon->expires_at->isPast()
+                )
+            ) {
 
                 throw new \RuntimeException(
-                    'قيمة السلة غير صالحة.'
+                    'كود الخصم غير صالح أو مستخدم بالفعل.'
                 );
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | الحصول على Coupon داخل Transaction
+            | Spin Wheel Coupon
             |--------------------------------------------------------------------------
             */
 
-            if ($couponCode) {
+            if ($coupon->spin_attempt_id) {
 
-                $coupon = Coupon::query()
-                    ->where(
-                        'code',
-                        strtoupper(trim($couponCode))
-                    )
-                    ->lockForUpdate()
-                    ->first();
+                $visitorToken = session()->get(
+                    'spin_visitor_token'
+                );
+
+
+                $attempt = $coupon->spinAttempt;
 
 
                 /*
                 |--------------------------------------------------------------------------
-                | التأكد من صلاحية الكوبون
+                | Validate Visitor
                 |--------------------------------------------------------------------------
                 */
 
                 if (
-                    !$coupon ||
-                    $coupon->is_used ||
-                    (
-                        $coupon->expires_at &&
-                        $coupon->expires_at->isPast()
+                    !$attempt ||
+                    !$visitorToken ||
+                    !hash_equals(
+                        (string) $attempt->visitor_token,
+                        (string) $visitorToken
                     )
                 ) {
 
                     throw new \RuntimeException(
-                        'كود الخصم غير صالح أو مستخدم بالفعل.'
+                        'لا يمكنك استخدام هذا الكوبون.'
                     );
                 }
 
 
                 /*
                 |--------------------------------------------------------------------------
-                | التحقق من Spin Wheel Coupon
+                | Spin Attempt Already Used
                 |--------------------------------------------------------------------------
                 */
 
-                if ($coupon->spin_attempt_id) {
+                if ($attempt->is_used) {
 
-                    $visitorToken = session()->get(
-                        'spin_visitor_token'
+                    throw new \RuntimeException(
+                        'تم استخدام هذه الجائزة بالفعل.'
                     );
-
-                    $attempt = $coupon->spinAttempt;
-
-
-                    if (
-                        !$attempt ||
-                        !$visitorToken ||
-                        !hash_equals(
-                            (string) $attempt->visitor_token,
-                            (string) $visitorToken
-                        )
-                    ) {
-
-                        throw new \RuntimeException(
-                            'لا يمكنك استخدام هذا الكوبون.'
-                        );
-                    }
-
-
-                    if ($attempt->is_used) {
-
-                        throw new \RuntimeException(
-                            'تم استخدام هذه الجائزة بالفعل.'
-                        );
-                    }
                 }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | حساب نسبة الخصم
-                |--------------------------------------------------------------------------
-                */
-
-                $discountPercent = (float) (
-                    $coupon->discount_percent ?? 0
-                );
-
-
-                $discountPercent = max(
-                    0,
-                    min(100, $discountPercent)
-                );
-
-
-                $discount = round(
-                    $subtotal *
-                    ($discountPercent / 100),
-                    2
-                );
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | Total
+            | Discount Percentage
             |--------------------------------------------------------------------------
             */
 
-            $total = max(
-                0,
-                $subtotal - $discount
+            $discountPercent = (float) (
+                $coupon->discount_percent ?? 0
             );
 
 
             /*
             |--------------------------------------------------------------------------
-            | إنشاء Order
+            | Protect Percentage
             |--------------------------------------------------------------------------
             */
 
-            $order = Order::create([
+            $discountPercent = max(
+                0,
+                min(
+                    100,
+                    $discountPercent
+                )
+            );
 
-                /*
-                |--------------------------------------------------------------------------
-                | Token بدلاً من ID في الروابط العامة
-                |--------------------------------------------------------------------------
-                */
 
-                'user_id' => auth()->id(),
+            /*
+            |--------------------------------------------------------------------------
+            | Discount
+            |--------------------------------------------------------------------------
+            */
 
-                'payment_token' =>
-                    Str::random(64),
+            $discount = round(
+                $subtotal *
+                ($discountPercent / 100),
+                2
+            );
+        }
 
-                'customer_name' =>
+
+        /*
+        |--------------------------------------------------------------------------
+        | Total
+        |--------------------------------------------------------------------------
+        */
+
+        $total = max(
+            0,
+            $subtotal - $discount
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Payment Token
+        |--------------------------------------------------------------------------
+        */
+
+        $paymentToken = Str::random(64);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create Order
+        |--------------------------------------------------------------------------
+        */
+
+        $order = Order::create([
+
+            /*
+            |--------------------------------------------------------------------------
+            | User
+            |--------------------------------------------------------------------------
+            */
+
+            'user_id' => auth()->id(),
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Secure Public Token
+            |--------------------------------------------------------------------------
+            */
+
+            'payment_token' =>
+                $paymentToken,
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Customer
+            |--------------------------------------------------------------------------
+            */
+
+            'customer_name' =>
+                $validated['customer_name'],
+
+            'phone' =>
+                $validated['phone'],
+
+            'email' =>
+                $validated['email'] ?? null,
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Address
+            |--------------------------------------------------------------------------
+            */
+
+            'country' =>
+                $validated['country'],
+
+            'city' =>
+                $validated['city'],
+
+            'zip' =>
+                $validated['zip'],
+
+            'address' =>
+                $validated['address'],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Totals
+            |--------------------------------------------------------------------------
+            */
+
+            'quantity' =>
+                $totalQuantity,
+
+            'subtotal' =>
+                $subtotal,
+
+            'total' =>
+                $total,
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Payment
+            |--------------------------------------------------------------------------
+            */
+
+            'payment_status' =>
+                'pending',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Order Items
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($products as $product) {
+
+            $quantity = (int) (
+                $cart[$product->id] ?? 0
+            );
+
+
+            if ($quantity <= 0) {
+                continue;
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Price
+            |--------------------------------------------------------------------------
+            */
+
+            $price = $product->discount_price
+                ?? $product->price;
+
+
+            $price = (float) $price;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Item Subtotal
+            |--------------------------------------------------------------------------
+            */
+
+            $itemSubtotal = round(
+                $price * $quantity,
+                2
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create Order Item
+            |--------------------------------------------------------------------------
+            */
+
+            $order->items()->create([
+
+                'product_id' =>
+                    $product->id,
+
+                'product_name' =>
+                    $product->name,
+
+                'price' =>
+                    $price,
+
+                'quantity' =>
+                    $quantity,
+
+                'subtotal' =>
+                    $itemSubtotal,
+            ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mark Coupon Used
+        |--------------------------------------------------------------------------
+        |
+        | ملاحظة:
+        | هنا أنت تعتبر الكوبون مستخدمًا عند إنشاء الطلب
+        | وليس عند نجاح الدفع.
+        |
+        */
+
+        if ($coupon) {
+
+            $coupon->update([
+
+                'is_used' =>
+                    true,
+
+                'order_id' =>
+                    $order->id,
+
+                'used_at' =>
+                    now(),
+            ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Spin Attempt
+            |--------------------------------------------------------------------------
+            */
+
+            if ($coupon->spin_attempt_id) {
+
+                $attempt =
+                    $coupon->spinAttempt;
+
+
+                if ($attempt) {
+
+                    $attempt->update([
+
+                        'is_used' =>
+                            true,
+
+                        'used_at' =>
+                            now(),
+                    ]);
+                }
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Return Order
+        |--------------------------------------------------------------------------
+        */
+
+        return $order;
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Forget Coupon From Session
+    |--------------------------------------------------------------------------
+    */
+
+    session()->forget(
+        'checkout_coupon_code'
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save Shipping Address
+    |--------------------------------------------------------------------------
+    |
+    | فقط للمستخدم المسجل.
+    |
+    */
+
+    if (auth()->check()) {
+
+        $user = auth()->user();
+
+
+        $shippingAddress =
+            $user->defaultShippingAddress;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Existing Address
+        |--------------------------------------------------------------------------
+        */
+
+        if ($shippingAddress) {
+
+            $shippingAddress->update([
+
+                'name' =>
                     $validated['customer_name'],
 
                 'phone' =>
@@ -1165,176 +1774,94 @@ class StoreController extends Controller
                 'email' =>
                     $validated['email'] ?? null,
 
-                'country' =>
+                'country_id' =>
                     $validated['country'],
 
                 'city' =>
                     $validated['city'],
 
+                'address' =>
+                    $validated['address'],
+
                 'zip' =>
                     $validated['zip'],
+            ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create Address
+        |--------------------------------------------------------------------------
+        */
+
+        else {
+
+            $user->shippingAddresses()->create([
+
+                'name' =>
+                    $validated['customer_name'],
+
+                'phone' =>
+                    $validated['phone'],
+
+                'email' =>
+                    $validated['email'] ?? null,
+
+                'country_id' =>
+                    $validated['country'],
+
+                'city' =>
+                    $validated['city'],
 
                 'address' =>
                     $validated['address'],
 
-                'quantity' =>
-                    $totalQuantity,
+                'zip' =>
+                    $validated['zip'],
 
-                'subtotal' =>
-                    $subtotal,
-
-                'total' =>
-                    $total,
-
-                'payment_status' =>
-                    'pending',
+                'is_default' =>
+                    true,
             ]);
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Order Items
-            |--------------------------------------------------------------------------
-            */
-
-            foreach ($products as $product) {
-
-                $quantity = (int) (
-                    $cart[$product->id] ?? 0
-                );
-
-
-                if ($quantity <= 0) {
-                    continue;
-                }
-
-
-                $price = $product->discount_price
-                    ?? $product->price;
-
-
-                $itemSubtotal =
-                    $price * $quantity;
-
-
-                $order->items()->create([
-
-                    'product_id' =>
-                        $product->id,
-
-                    'product_name' =>
-                        $product->name,
-
-                    'price' =>
-                        $price,
-
-                    'quantity' =>
-                        $quantity,
-
-                    'subtotal' =>
-                        $itemSubtotal,
-                ]);
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | ربط الكوبون بالطلب إن كان جدول orders
-            | يحتوي على coupon_id
-            |--------------------------------------------------------------------------
-            |
-            | إذا كان عندك coupon_id في orders يمكنك تفعيل هذا:
-            |
-            | $order->update([
-            |     'coupon_id' => $coupon->id,
-            | ]);
-            |
-            */
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Mark Coupon Used
-            |--------------------------------------------------------------------------
-            |
-            | لا نعتبر الكوبون مستخدماً بمجرد الضغط على
-            | "تطبيق الكوبون".
-            |
-            | يصبح مستخدماً عند إنشاء الطلب.
-            |--------------------------------------------------------------------------
-            */
-
-            if ($coupon) {
-
-                $coupon->update([
-                    'is_used'  => true,
-                    'order_id' => $order->id,
-                    'used_at'  => now(),
-                ]);
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | تحديث Spin Attempt
-                |--------------------------------------------------------------------------
-                */
-
-                if ($coupon->spin_attempt_id) {
-
-                    $attempt = $coupon->spinAttempt;
-
-                    if ($attempt) {
-
-                        $attempt->update([
-                            'is_used' => true,
-                            'used_at' => now(),
-                        ]);
-                    }
-                }
-            }
-
-
-            return $order;
-        });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | حذف Coupon من Session
-        |--------------------------------------------------------------------------
-        */
-
-        session()->forget(
-            'checkout_coupon_code'
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | يمكن لاحقاً حذف Cart بعد نجاح الدفع
-        |--------------------------------------------------------------------------
-        |
-        | حالياً لا نحذفه هنا لأن PayTabs لم يؤكد الدفع بعد.
-        |
-        */
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | PayTabs
-        |--------------------------------------------------------------------------
-        */
-
-        return redirect()
-            ->route(
-                'payment.pay',
-                $order
-            )
-            ->with(
-                'success',
-                'تم إنشاء الطلب بنجاح.'
-            );
+        }
     }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMPORTANT:
+    | Cart is NOT deleted here
+    |--------------------------------------------------------------------------
+    |
+    | السبب:
+    |
+    | الطلب حاليًا Pending.
+    |
+    | PayTabs لم يؤكد الدفع بعد.
+    |
+    | لذلك لا نحذف cart_items ولا Session Cart هنا.
+    |
+    | سيتم حذف السلة بعد نجاح الدفع في Callback / Return.
+    |
+    */
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PayTabs
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()
+        ->route(
+            'payment.pay',
+            $order
+        )
+        ->with(
+            'success',
+            'تم إنشاء الطلب بنجاح.'
+        );
+}
 
 
     /**

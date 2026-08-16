@@ -637,7 +637,6 @@
 
 <div class="payment-page">
 
-```
 <main class="px-5 md:px-8 py-10 md:py-14">
 
     <div class="max-w-2xl mx-auto">
@@ -785,7 +784,7 @@
                                 {{ number_format($order->total, 2) }}
 
                                 <span class="text-purple text-xs">
-                                    {{ config('services.paytabs.currency', 'EGP') }}
+                                    {{ config('services.paytabs.currency', 'USD') }}
                                 </span>
 
                             </span>
@@ -982,7 +981,7 @@
                                 {{ number_format($order->total, 2) }}
 
                                 <span class="text-purple text-xs">
-                                    {{ config('services.paytabs.currency', 'EGP') }}
+                                    {{ config('services.paytabs.currency', 'USD') }}
                                 </span>
 
                             </span>
@@ -1175,7 +1174,7 @@
                                 {{ number_format($order->total, 2) }}
 
                                 <span class="text-purple text-xs">
-                                    {{ config('services.paytabs.currency', 'EGP') }}
+                                    {{ config('services.paytabs.currency', 'USD') }}
                                 </span>
 
                             </span>
@@ -1307,7 +1306,7 @@
     </div>
 
 </main>
-```
+
 
 </div>
 

@@ -778,6 +778,35 @@
 
                         @csrf
 
+                        @if(auth()->check() && $shippingAddress)
+
+                            <div class="mb-5 rounded-2xl border border-[var(--purple)]/10 bg-[var(--purple-soft)] px-4 py-3">
+
+                                <div class="flex items-start gap-3">
+
+                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--purple)] text-white">
+                                        ✓
+                                    </div>
+
+                                    <div>
+
+                                        <p class="text-sm font-bold text-[var(--text)]">
+                                            تم تحميل بيانات الشحن
+                                        </p>
+
+                                        <p class="mt-1 text-xs leading-6 text-[var(--muted)]">
+                                            استخدمنا بيانات الشحن المحفوظة في حسابك.
+                                            يمكنك تعديلها قبل إتمام الطلب.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endif
+
 
                         {{-- NAME --}}
                         <div>
@@ -795,7 +824,7 @@
                                 type="text"
                                 name="customer_name"
                                 class="field"
-                                value="{{ old('customer_name') }}"
+                                value="{{ old('customer_name', $shippingAddress?->name) }}"
                                 placeholder="أدخلي اسمك الكامل"
                                 required>
 
@@ -818,7 +847,7 @@
                                 type="tel"
                                 name="phone"
                                 class="field"
-                                value="{{ old('phone') }}"
+                                value="{{ old('phone', $shippingAddress?->phone) }}"
                                 placeholder="مثال: +966 5XXXXXXXX"
                                 required>
 
@@ -845,7 +874,7 @@
                                 type="email"
                                 name="email"
                                 class="field"
-                                value="{{ old('email') }}"
+                                value="{{ old('email', $shippingAddress?->email ?? auth()->user()?->email) }}"
                                 placeholder="example@email.com">
 
                         </div>
@@ -881,7 +910,7 @@
                                         <option
                                             value="{{ $country->id }}"
                                             data-country-code="{{ $country->code }}"
-                                            {{ old('country') == $country->id ? 'selected' : '' }}
+                                            {{ old('country', $shippingAddress?->country_id) == $country->id ? 'selected' : '' }}
                                         >
                                             {{ $country->name }}
                                         </option>
@@ -924,7 +953,7 @@
                                         type="text"
                                         id="city"
                                         name="city"
-                                        value="{{ old('city') }}"
+                                        value="{{ old('city', $shippingAddress?->city) }}"
                                         required
                                         autocomplete="address-level2"
                                         placeholder="مثال: الرياض"
@@ -955,7 +984,7 @@
                                         type="text"
                                         id="zip"
                                         name="zip"
-                                        value="{{ old('zip') }}"
+                                        value={{ old('zip', $shippingAddress?->zip) }}
                                         required
                                         inputmode="numeric"
                                         autocomplete="postal-code"
@@ -999,7 +1028,7 @@
                                 name="address"
                                 class="field"
                                 placeholder="الشارع، المبنى، رقم الشقة، وأي علامة مميزة..."
-                                required>{{ old('address') }}</textarea>
+                                required>{{ old('address', $shippingAddress?->address) }}</textarea>
 
                         </div>
 
@@ -1287,7 +1316,7 @@
                                             {{ number_format($item['subtotal'], 2) }}
 
                                             <span class="text-xs ms-1">
-                                                {{ config('services.paytabs.currency', 'EGP') }}
+                                                {{ config('services.paytabs.currency', 'USD') }}
                                             </span>
 
                                         </div>
@@ -1331,7 +1360,7 @@
                                     {{ number_format($subtotal, 2) }}
 
                                     <span class="text-xs text-purple-600 ms-1">
-                                        {{ config('services.paytabs.currency', 'EGP') }}
+                                        {{ config('services.paytabs.currency', 'USD') }}
                                     </span>
 
                                 </span>
@@ -1363,7 +1392,7 @@
                                         -{{ number_format($discount, 2) }}
 
                                         <span class="text-xs ms-1">
-                                            {{ config('services.paytabs.currency', 'EGP') }}
+                                            {{ config('services.paytabs.currency', 'USD') }}
                                         </span>
 
                                     </span>
@@ -1412,7 +1441,7 @@
 
                                             {{ number_format($subtotal, 2) }}
 
-                                            {{ config('services.paytabs.currency', 'EGP') }}
+                                            {{ config('services.paytabs.currency', 'USD') }}
 
                                         </div>
 
@@ -1429,7 +1458,7 @@
 
                                     <span class="block text-gray-500 text-xs mt-2">
 
-                                        {{ config('services.paytabs.currency', 'EGP') }}
+                                        {{ config('services.paytabs.currency', 'USD') }}
 
                                     </span>
 
@@ -1454,7 +1483,7 @@
                                             {{ number_format($discount, 2) }}
                                         </strong>
 
-                                        {{ config('services.paytabs.currency', 'EGP') }}
+                                        {{ config('services.paytabs.currency', 'USD') }}
 
                                         باستخدام الكوبون
 
@@ -1608,6 +1637,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
 
             availability.classList.remove('hidden');
+
+            console.log(data);
 
             if (data.available) {
 

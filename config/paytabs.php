@@ -8,6 +8,6 @@ return [
 
     'region' => env('PAYTABS_REGION', 'EGY'),
 
-    'currency' => env('PAYTABS_CURRENCY', 'EGP'),
+    'currency' => env('PAYTABS_CURRENCY', 'USD'),
 
 ];
