@@ -503,6 +503,69 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('submit', function (event) {
 
+        let valid = true;
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Test Card
+        |----------------------------------------------------------------------
+        */
+
+        const card = testCard.value.replace(/\D/g, '');
+
+        if (card.length !== 16) {
+
+            testCardError.textContent =
+                'أدخل رقم بطاقة مكونًا من 16 رقمًا.';
+
+            testCardError.classList.remove('hidden');
+
+            testCard.classList.add('border-red-400');
+
+            valid = false;
+
+        } else {
+
+            testCard.classList.remove('border-red-400');
+
+        }
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Expiry
+        |----------------------------------------------------------------------
+        */
+
+        if (!validateExpiry(true)) {
+
+            valid = false;
+
+        }
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Stop Submit
+        |----------------------------------------------------------------------
+        */
+
+        if (!valid) {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Loading
+        |----------------------------------------------------------------------
+        */
+
         button.disabled = true;
 
         spinner.classList.remove('hidden');

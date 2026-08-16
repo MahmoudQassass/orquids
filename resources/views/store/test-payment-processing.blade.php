@@ -55,7 +55,7 @@
 
                 <span class="h-2 w-2 rounded-full bg-green-500"></span>
 
-                TEST PAYMENT
+                 PAYMENT
 
             </div>
 

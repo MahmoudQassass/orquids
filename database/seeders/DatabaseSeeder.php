@@ -18,9 +18,10 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
-        //    AdminSeeder::class,
+            AdminSeeder::class,
             SpinPrizeSeeder::class,
             CountrySeeder::class,
+            CategorySeeder::class,
         ]);
     }
 }
