@@ -471,10 +471,10 @@
                                     <div class="image-card position-relative overflow-hidden rounded-4 border">
 
                                         <img
-                                            src="{{ asset('storage/' . $image->image) }}"
-                                            alt="{{ $product->name }}"
-                                            class="w-100"
-                                            style="height:180px;object-fit:cover;">
+                                        src="{{ $image->url }}"
+                                        alt="{{ $product->name }}"
+                                        class="w-100"
+                                        style="height:180px;object-fit:cover;">
 
 
                                         @if($loop->first)

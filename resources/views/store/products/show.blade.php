@@ -949,7 +949,7 @@
                             >
 
                                 <img
-                                    src="{{ asset('storage/' . $image->image) }}"
+                                    src="{{ $image->url }}"
                                     alt="{{ $product->name }} - صورة {{ $index + 1 }}"
                                     loading="lazy"
                                 >
