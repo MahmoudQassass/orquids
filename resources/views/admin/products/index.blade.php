@@ -230,7 +230,7 @@
                             @if($product->images->first())
 
                                 <img
-                                    src="{{ asset('storage/' . $product->images->first()->image) }}"
+                                    src="{{ $product->images->first()->url }}"
                                     alt="{{ $product->name }}"
                                     class="w-100 h-100"
                                     style="object-fit:cover;">
