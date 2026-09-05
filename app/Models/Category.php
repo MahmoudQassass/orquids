@@ -23,4 +23,15 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($category) {
+
+            if (empty($category->slug)) {
+                $category->slug = Str::slug($category->name);
+            }
+
+        });
+    }
 }

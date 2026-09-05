@@ -17,7 +17,8 @@ use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\StoreAuthController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\TestPaymentController;
-
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CountryController;
 
 
 Route::post(
@@ -397,6 +398,20 @@ Route::prefix('admin')
                 'coupons/generate',
                 [CouponController::class, 'generate']
             )->name('coupons.generate');
+
+                    Route::resource(
+            'categories',
+            CategoryController::class
+        )->except([
+            'show'
+        ]);
+
+        Route::resource(
+            'countries',
+            CountryController::class
+        )->except([
+            'show'
+        ]);
 
         });
 

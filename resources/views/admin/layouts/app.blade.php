@@ -1026,6 +1026,496 @@
 
         }
 
+        :root {
+    --sidebar-width: 270px;
+    --sidebar-collapsed-width: 78px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.admin-sidebar {
+    position: fixed;
+
+    top: 0;
+    right: 0;
+
+    width: var(--sidebar-collapsed-width);
+    height: 100vh;
+
+    background: var(--sidebar);
+
+    z-index: 1050;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    transition: width .28s cubic-bezier(.4, 0, .2, 1);
+
+    box-shadow:
+        -10px 0 30px rgba(0,0,0,.05);
+}
+
+
+/* عندما يكون الماوس فوق الـSidebar */
+
+.admin-sidebar:hover {
+    width: var(--sidebar-width);
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.admin-main {
+    margin-right: var(--sidebar-collapsed-width);
+
+    min-height: 100vh;
+
+    transition:
+        margin-right .28s cubic-bezier(.4, 0, .2, 1);
+}
+
+
+/* عندما يفتح الـSidebar */
+
+.admin-sidebar:hover ~ .admin-main {
+    margin-right: var(--sidebar-width);
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.sidebar-brand {
+    height: 78px;
+
+    padding: 0 19px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.07);
+
+    white-space: nowrap;
+}
+
+
+/* اسم المتجر */
+
+.brand-info {
+    opacity: 0;
+
+    width: 0;
+
+    overflow: hidden;
+
+    transition:
+        opacity .18s ease,
+        width .28s ease;
+}
+
+
+/* عند فتح Sidebar */
+
+.admin-sidebar:hover .brand-info {
+    opacity: 1;
+    width: 150px;
+}
+
+
+/* زر الفتح لم يعد مطلوبًا */
+
+.sidebar-toggle {
+    display: none !important;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.sidebar-content {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 22px 10px;
+}
+
+
+/* =========================================================
+   SECTION
+========================================================= */
+
+.sidebar-section {
+    color: #6b7280;
+
+    font-size: 0;
+
+    font-weight: 700;
+
+    height: 10px;
+
+    margin: 10px 4px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    transition:
+        font-size .2s ease,
+        height .28s ease,
+        margin .28s ease;
+}
+
+
+/* عند الفتح */
+
+.admin-sidebar:hover .sidebar-section {
+    font-size: 11px;
+
+    height: auto;
+
+    margin:
+        10px 12px;
+}
+
+
+/* =========================================================
+   NAV
+========================================================= */
+
+.sidebar-nav {
+    list-style: none;
+
+    padding: 0;
+
+    margin: 0 0 24px;
+}
+
+
+.sidebar-nav li {
+    margin-bottom: 5px;
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+.sidebar-link {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    width: 100%;
+
+    min-height: 46px;
+
+    padding: 0;
+
+    border-radius: 12px;
+
+    color: var(--sidebar-text);
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+
+/* عند فتح Sidebar */
+
+.admin-sidebar:hover .sidebar-link {
+    justify-content: flex-start;
+
+    padding: 0 14px;
+}
+
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.sidebar-link i {
+    width: 22px;
+
+    min-width: 22px;
+
+    text-align: center;
+
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+.sidebar-link span {
+    display: none;
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    transition: opacity .15s ease;
+}
+
+
+.admin-sidebar:hover .sidebar-link span {
+    display: inline;
+
+    opacity: 1;
+}
+
+
+/* =========================================================
+   BADGE
+========================================================= */
+
+.sidebar-badge {
+    display: none;
+}
+
+
+.admin-sidebar:hover .sidebar-badge {
+    display: inline-block;
+
+    margin-right: auto;
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.sidebar-link:hover {
+    color: white;
+
+    background: var(--sidebar-hover);
+
+    transform: translateX(-2px);
+}
+
+
+/* =========================================================
+   ACTIVE
+========================================================= */
+
+.sidebar-link.active {
+    color: #111827;
+
+    background: white;
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,.12);
+}
+
+
+.sidebar-link.active i {
+    color: #111827;
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+.sidebar-footer {
+    padding: 12px 10px;
+
+    border-top:
+        1px solid rgba(255,255,255,.07);
+}
+
+
+.admin-profile {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 11px;
+
+    padding: 8px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,.04);
+}
+
+
+.admin-sidebar:hover .admin-profile {
+    justify-content: flex-start;
+
+    padding: 10px;
+}
+
+
+.profile-name,
+.profile-role {
+    display: none;
+}
+
+
+.admin-sidebar:hover .profile-name,
+.admin-sidebar:hover .profile-role {
+    display: block;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.admin-sidebar .sidebar-footer form .sidebar-link {
+    justify-content: center;
+}
+
+
+.admin-sidebar:hover .sidebar-footer form .sidebar-link {
+    justify-content: flex-start;
+
+    padding: 0 14px;
+}
+
+
+/* =========================================================
+   TOOLTIP
+========================================================= */
+
+.sidebar-link::after {
+    content: attr(title);
+
+    position: absolute;
+
+    right: calc(100% + 10px);
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    background: #111827;
+
+    color: white;
+
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition: .15s ease;
+
+    z-index: 2000;
+}
+
+
+/* Tooltip يظهر فقط عندما يكون Sidebar مغلق */
+
+.admin-sidebar:not(:hover) .sidebar-link:hover::after {
+    opacity: 1;
+
+    visibility: visible;
+}
+
+@media (max-width: 991.98px) {
+
+    .admin-sidebar {
+        width: var(--sidebar-width);
+
+        transform: translateX(100%);
+
+        transition:
+            transform .28s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .admin-sidebar:hover {
+        width: var(--sidebar-width);
+    }
+
+    .admin-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .admin-main {
+        margin-right: 0;
+    }
+
+    .admin-sidebar:hover ~ .admin-main {
+        margin-right: 0;
+    }
+
+    /* إظهار المحتوى كاملًا في الموبايل */
+
+    .admin-sidebar .brand-info,
+    .admin-sidebar .sidebar-link span,
+    .admin-sidebar .profile-name,
+    .admin-sidebar .profile-role {
+        display: block;
+
+        opacity: 1;
+
+        width: auto;
+    }
+
+    .admin-sidebar .sidebar-section {
+        font-size: 11px;
+
+        height: auto;
+
+        margin: 10px 12px;
+    }
+
+    .admin-sidebar .sidebar-link {
+        justify-content: flex-start;
+
+        padding: 0 14px;
+    }
+
+    .admin-sidebar .admin-profile {
+        justify-content: flex-start;
+    }
+
+    .sidebar-toggle {
+        display: none !important;
+    }
+}
+
     </style>
 
     @stack('styles')
@@ -1066,6 +1556,14 @@
             </span>
 
         </div>
+
+        <button
+            type="button"
+            class="mobile-menu-btn btn btn-light rounded-3 shadow-sm border"
+            aria-label="فتح القائمة"
+        >
+            <i class="bi bi-list fs-5"></i>
+        </button>
 
     </div>
 
@@ -1177,6 +1675,32 @@
 
                     <span class="sidebar-text">
                         العملاء
+                    </span>
+                </a>
+            </li>
+
+             <li>
+                <a
+                    href="{{ route('admin.categories.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
+                >
+                    <i class="bi bi-tags-fill"></i>
+
+                    <span>
+                        التصنيفات
+                    </span>
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="{{ route('admin.countries.index') }}"
+                    class="sidebar-link {{ request()->routeIs('admin.countries.*') ? 'active' : '' }}"
+                >
+                    <i class="bi bi-globe2"></i>
+
+                    <span>
+                        الدول
                     </span>
                 </a>
             </li>
@@ -1588,6 +2112,183 @@
         }
     );
 
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.querySelector('.admin-sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const menuButton = document.querySelector('.mobile-menu-btn');
+
+    if (!sidebar) {
+        return;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile Sidebar
+    |--------------------------------------------------------------------------
+    */
+
+    function openMobileSidebar() {
+        sidebar.classList.add('show');
+
+        if (overlay) {
+            overlay.classList.add('show');
+        }
+
+        document.body.classList.add('sidebar-open');
+    }
+
+    function closeMobileSidebar() {
+        sidebar.classList.remove('show');
+
+        if (overlay) {
+            overlay.classList.remove('show');
+        }
+
+        document.body.classList.remove('sidebar-open');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile Menu Button
+    |--------------------------------------------------------------------------
+    */
+
+    if (menuButton) {
+        menuButton.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            if (sidebar.classList.contains('show')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        });
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Overlay
+    |--------------------------------------------------------------------------
+    */
+
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            closeMobileSidebar();
+        });
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Mobile Sidebar When Clicking Link
+    |--------------------------------------------------------------------------
+    */
+
+    const sidebarLinks = sidebar.querySelectorAll('a');
+
+    sidebarLinks.forEach(function (link) {
+        link.addEventListener('click', function () {
+
+            if (window.innerWidth <= 991) {
+                closeMobileSidebar();
+            }
+
+        });
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Desktop Hover Sidebar
+    |--------------------------------------------------------------------------
+    |
+    | لا نستخدم click أو localStorage هنا.
+    |
+    | CSS هو المسؤول عن التمدد والانكماش:
+    |
+    | collapsed -> default
+    | expanded  -> mouse hover
+    |
+    */
+
+    function handleResponsiveSidebar() {
+
+        if (window.innerWidth > 991) {
+
+            // التأكد من إزالة حالة الموبايل
+            sidebar.classList.remove('show');
+
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
+
+            document.body.classList.remove('sidebar-open');
+
+        }
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resize
+    |--------------------------------------------------------------------------
+    */
+
+    window.addEventListener('resize', handleResponsiveSidebar);
+
+    handleResponsiveSidebar();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Prevent Body Scroll On Mobile
+    |--------------------------------------------------------------------------
+    */
+
+    const observer = new MutationObserver(function () {
+
+        if (
+            window.innerWidth <= 991 &&
+            sidebar.classList.contains('show')
+        ) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+    });
+
+    observer.observe(sidebar, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Escape Key
+    |--------------------------------------------------------------------------
+    */
+
+    document.addEventListener('keydown', function (event) {
+
+        if (
+            event.key === 'Escape' &&
+            sidebar.classList.contains('show')
+        ) {
+            closeMobileSidebar();
+        }
+
+    });
+
+});
 </script>
 
 
